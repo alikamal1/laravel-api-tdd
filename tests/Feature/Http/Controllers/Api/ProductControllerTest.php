@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
+
     /** @test */
     public function can_create_a_product()
     {
@@ -42,4 +43,33 @@ class ProductControllerTest extends TestCase
             'price' => $price
         ]);
     }
+
+    /** @test */
+    public function can_return_a_product()
+    {
+        // Given
+        $product = $this->create('Product');
+
+        // When
+        $repsonse = $this->json('GET', "api/products/$product->id");
+
+        // Then
+        $repsonse->assertStatus(200)
+            ->assertExactJson([
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => (string) $product->price,
+                'created_at' => (string) $product->created_at,
+            ]);
+    }
+
+     /** @test */
+     public function will_fail_with_a_404_if_product_is_not_found()
+     {
+         $repsonse = $this->json('GET', "api/products/-1");
+ 
+         // Then
+         $repsonse->assertStatus(404);
+     }
 }
