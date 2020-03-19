@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase; // restart db after each test
 
     /** @test */
     public function can_create_a_product()
@@ -59,7 +59,7 @@ class ProductControllerTest extends TestCase
                 'id' => $product->id,
                 'name' => $product->name,
                 'slug' => $product->slug,
-                'price' => (string) $product->price,
+                'price' => $product->price,
                 'created_at' => (string) $product->created_at,
             ]);
     }
