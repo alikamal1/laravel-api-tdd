@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api;
 
 use Faker\Factory;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -25,6 +26,7 @@ class ProductControllerTest extends TestCase
             'slug' => str_slug($name),
             'price' => $price = random_int(10, 100)
         ]);
+        Log::info(1, [$repsonse->getContent()]);
         
         // Then
         $repsonse->assertStatus(201)
