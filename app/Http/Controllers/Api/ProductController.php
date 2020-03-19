@@ -15,7 +15,6 @@ class ProductController extends Controller
             'slug' => str_slug($request->name),
             'price' => $request->price
         ]);
-
         return response()->json($product, 201);
     }
 }

@@ -9,11 +9,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductControllerTest extends TestCase
 {
+    use RefreshDatabase;
     /** @test */
     public function can_create_a_product()
     {
-        // Given
+        // $this->withoutExceptionHandling();
 
+        // Given
+        
         // When
         $faker = Factory::create();
 
@@ -22,7 +25,7 @@ class ProductControllerTest extends TestCase
             'slug' => str_slug($name),
             'price' => $price = random_int(10, 100)
         ]);
-
+        
         // Then
         $repsonse->assertStatus(201)
             ->assertJsonStructure(['id', 'name', 'slug', 'price', 'created_at'])
