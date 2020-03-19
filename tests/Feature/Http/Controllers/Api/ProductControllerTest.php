@@ -136,4 +136,24 @@ class ProductControllerTest extends TestCase
             'id' => $product->id
         ]);
     }
+
+    /** @test */
+    public function can_return_a_collection_of_paginated_products()
+    {
+        $product1 = $this->create('Product');
+        $product2 = $this->create('Product');
+        $product3 = $this->create('Product');
+
+        $repsonse = $this->json('GET', "api/products");
+
+        Log::info($repsonse->content());
+
+        $repsonse->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name', 'slug', 'price', 'created_at']
+                ]
+            ]);
+    
+    }
 }
