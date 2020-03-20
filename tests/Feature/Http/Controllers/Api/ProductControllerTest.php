@@ -22,7 +22,7 @@ class ProductControllerTest extends TestCase
         // When
         $faker = Factory::create();
 
-        $repsonse = $this->json('POST', '/api/products', [
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('POST', '/api/products', [
             'name' => $name = $faker->company,
             'slug' => str_slug($name),
             'price' => $price = random_int(10, 100)
@@ -51,7 +51,7 @@ class ProductControllerTest extends TestCase
         $product = $this->create('Product');
 
         // When
-        $repsonse = $this->json('GET', "api/products/$product->id");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('GET', "api/products/$product->id");
 
         // Then
         $repsonse->assertStatus(200)
@@ -67,7 +67,7 @@ class ProductControllerTest extends TestCase
     /** @test */
     public function will_fail_with_a_404_if_product_is_not_found()
     {
-        $repsonse = $this->json('GET', "api/products/-1");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('GET', "api/products/-1");
 
         // Then
         $repsonse->assertStatus(404);
@@ -76,7 +76,7 @@ class ProductControllerTest extends TestCase
     /** @test */
     public function will_fail_with_a_404_if_product_we_want_to_update_is_an_avaiable()
     {
-        $repsonse = $this->json('PUT', "api/products/-1");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('PUT', "api/products/-1");
 
         // Then
         $repsonse->assertStatus(404);
@@ -89,7 +89,7 @@ class ProductControllerTest extends TestCase
         $product = $this->create('Product');
 
         // When
-        $repsonse = $this->json('PUT', "api/products/$product->id", [
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('PUT', "api/products/$product->id", [
             'name' => $product->name . '_updated',
             'slug' => str_slug($product->name . '_updated'),
             'price' => $product->price + 10
@@ -116,7 +116,7 @@ class ProductControllerTest extends TestCase
     /** @test */
     public function will_fail_with_a_404_if_product_we_want_to_delete_is_an_avaiable()
     {
-        $repsonse = $this->json('DELETE', "api/products/-1");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('DELETE', "api/products/-1");
 
         // Then
         $repsonse->assertStatus(404);
@@ -127,7 +127,7 @@ class ProductControllerTest extends TestCase
     {
         $product = $this->create('Product');
 
-        $repsonse = $this->json('DELETE', "api/products/$product->id");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('DELETE', "api/products/$product->id");
 
         $repsonse->assertStatus(204)
             ->assertSee(null);
@@ -144,7 +144,7 @@ class ProductControllerTest extends TestCase
         $product2 = $this->create('Product');
         $product3 = $this->create('Product');
 
-        $repsonse = $this->json('GET', "api/products");
+        $repsonse = $this->actingAs($this->create('User', [], false), 'api')->json('GET', "api/products");
 
         Log::info($repsonse->content());
 
@@ -154,6 +154,25 @@ class ProductControllerTest extends TestCase
                     '*' => ['id', 'name', 'slug', 'price', 'created_at']
                 ]
             ]);
-    
+    }
+
+    /** @test */
+    public function non_authenticated_users_cannot_access_the_follwoing_end_points_for_the_products_api()
+    {
+        $index = $this->json('GET', '/api/products');
+        $index->assertStatus(401);
+        
+        $store = $this->json('POST', '/api/products');
+        $store->assertStatus(401);
+
+        $shpw = $this->json('GET', '/api/products/-1');
+        $shpw->assertStatus(401);
+
+        $update = $this->json('PUT', '/api/products/-1');
+        $update->assertStatus(401);
+
+        $destroy = $this->json('DELETE', '/api/products/-1');
+        $destroy->assertStatus(401);
+
     }
 }
